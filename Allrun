@@ -1,0 +1,27 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+
+echo "Cleaning previous run (if any)..."
+./Allclean
+
+echo "Running blockMesh..."
+blockMesh > log.blockMesh 2>&1 || { echo "blockMesh failed"; exit 1; }
+
+echo "Running setFields..."
+setFields > log.setFields 2>&1 || { echo "setFields failed"; exit 1; }
+
+echo "Running sonicFoam..."
+sonicFoam > log.sonicFoam 2>&1 || { echo "sonicFoam failed"; exit 1; }
+
+# Ensure magU field exists for sampling if sonicFoam doesn't write it explicitly
+# or if you want to be sure it's based on the final U field.
+# This might require checking if sonicFoam writes magU.
+# For now, let's assume sonicFoam handles it or it's calculated if necessary.
+# If 'sample' fails due to missing magU, this step needs to be revisited.
+# One way to ensure magU based on U:
+# foamCalc -time '0.001:0.007' mag U > log.foamCalc.magU 2>&1
+
+echo "Running post-processing (includes sampling defined in controlDict)..."
+postProcess > log.postProcess 2>&1 || { echo "postProcess failed"; exit 1; }
+
+echo "Allrun script finished."

@@ -1,0 +1,52 @@
+# OpenFOAM .gitignore
+
+# Compiled code and libraries
+*.so
+*.o
+dynamicCode/
+platforms/
+
+# Time step directories (numeric)
+[0-9]*
+[0-9].*[0-9]*
+#-0.[0-9]* # If you ever have negative times (unlikely for this case)
+
+# Initial condition directory (if 0 is generated from 0.org and 0.org is kept)
+# If 0.org is your template and 0 is the working dir, you might want to ignore 0
+# However, for this tutorial, 0 is small and often committed after setFields
+# so let's be explicit about what to ignore related to run outputs.
+# We will keep 0/ and 0.org/ as they are small setup files.
+
+# Mesh files
+constant/polyMesh/
+*.mesh
+*.msh # If you were using Gmsh externally and converting
+
+# Post-processing data
+postProcessing/
+*.vtk
+*.OpenFOAM
+*.foam # Dummy file for ParaView
+
+# Log files
+log
+log.*
+*.log
+
+# Parallel processing directories
+processor*
+
+# Other common OpenFOAM outputs
+*.dat
+*.xy
+*.raw
+*.gpi # Gnuplot scripts if generated
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Editor and OS specific
+*~
+.DS_Store
+Thumbs.db

@@ -1,0 +1,35 @@
+#!/bin/sh
+# Script to clean the OpenFOAM shockTube case
+
+# Ensure we are in the script's directory (case root)
+cd ${0%/*} || exit 1
+
+echo "Cleaning case..."
+
+# Remove time step directories (numeric directories)
+# This find command is safer than a broad rm glob
+find . -maxdepth 1 -type d -regex '\./[0-9]+\.?[0-9]*' -exec rm -rf {} +
+# Also remove if just '0' directory exists from a previous failed copy or manual creation
+if [ -d "0" ]; then
+    rm -rf "0"
+fi
+
+# Remove specific OpenFOAM generated directories and files
+rm -rf constant/polyMesh
+rm -rf postProcessing
+rm -rf processor*
+rm -f  log.* core.* # Remove log files and core dump files
+# If you have other specific log files like log.blockMesh, add them explicitly
+# rm -f log.blockMesh log.setFields log.sonicFoam log.sample log.foamCalc
+
+# Restore the 0 directory from 0.org
+if [ -d "0.org" ]; then
+    cp -r 0.org 0
+    echo "Restored 0 directory from 0.org."
+else
+    echo "ERROR: 0.org directory not found. Cannot restore 0 directory."
+    # Optionally, exit with an error if 0.org is critical and missing
+    # exit 1
+fi
+
+echo "Case cleaned."

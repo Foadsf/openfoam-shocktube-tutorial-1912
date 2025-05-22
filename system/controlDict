@@ -1,0 +1,95 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  3.0.x                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     sonicFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         0.007;
+
+deltaT          1e-05;
+
+writeControl    runTime;
+
+writeInterval   0.001;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+functions
+{
+    shockTubeSampling // This is a user-defined name for this function object entry
+    {
+        // Copy contents from system/sampleDict here, adjusting slightly for function object syntax
+        type                sets; // The type of functionObject
+        functionObjectLibs ("libsampling.so"); // Library that provides 'sets'
+
+        // Control when this executes during postProcess
+        // For postProcess, it usually runs on available time steps
+        // If run during solver, you'd use writeControl, startTime, etc.
+        
+        interpolationScheme cellPoint; // from your sampleDict
+        setFormat           raw;       // from your sampleDict
+
+        sets // This sub-dictionary holds the set definitions
+        (
+            data // The name of your set from sampleDict
+            {
+                type    uniform;
+                axis    x;
+                start   (-4.995 0 0);
+                end     (4.995 0 0);
+                nPoints 1000;
+            }
+        );
+
+        fields (T U p mag(U));
+                                 // Ensure magU is available or calculable
+                                 // sonicFoam should write U, p, T. magU might need to be calculated
+                                 // by another function object if not written by the solver.
+    }
+
+    // Optional: Add a function object to calculate and write mag(U) if sonicFoam doesn't
+    // This would run before the 'sets' function object if ordered correctly or run by solver.
+    // magUField
+    // {
+    //     type fieldMinMax; // A simple way to get it written, or use 'writeRegisteredObject'
+    //     functionObjectLibs ("libfieldFunctionObjects.so");
+    //     enabled true;
+    //     outputControl outputTime;
+    //     fields (mag(U)); // Calculate mag(U) and it will be written as mag(U)
+    //                      // You might need to rename this to 'magU' for the 'sets' to pick it up
+    //                      // or modify 'sets' to look for 'mag(U)'
+    // }
+}
+
+// ************************************************************************* //
