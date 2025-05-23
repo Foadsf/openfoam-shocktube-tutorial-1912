@@ -9,28 +9,26 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    location    "system";
-    object      sampleDict;
+    class       volScalarField;
+    object      p;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-interpolationScheme cellPoint;
+dimensions      [1 -1 -2 0 0 0 0];
 
-setFormat       raw;
+internalField   uniform 0;
 
-sets
-(
-    data
+boundaryField
+{
+    sides
     {
-        type    uniform;
-        axis    x;
-        start   (-4.995 0 0);
-        end     (4.995 0 0);
-        nPoints 1000;
+        type            zeroGradient;
     }
-);
 
-fields          (T U p);
+    empty
+    {
+        type            empty;
+    }
+}
 
 // ************************************************************************* //
